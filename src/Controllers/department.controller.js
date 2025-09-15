@@ -4,6 +4,7 @@ import Department from "../Models/department.model.js";
 import { validationResult } from "express-validator";
 import mongoose from "mongoose";
 import parseValidations from "../Utils/parseValidations.js";
+import Employee from "../Models/employee.model.js";
 
 // ======================= create department ========================
 const addDepartment = asyncHandler(async (req, res) => {
@@ -26,7 +27,12 @@ const addDepartment = asyncHandler(async (req, res) => {
 
 // ====================== get all departments =======================
 const getDepartments = asyncHandler(async (req, res) => {
-  const departments = await Department.find();
+  const departments = await Department.find().populate([
+    {
+      path: "managerId",
+      select: "name",
+    },
+  ]);
   handleSuccess(res, "Departments fetched successfully", 200, departments);
 });
 // ===================== get single department =======================
@@ -89,10 +95,35 @@ const updateDepartmentStatus = asyncHandler(async (req, res) => {
   );
 });
 
+// ============================= assign the departement to the employee ===========================
+const assignDepartment = asyncHandler(async (req, res) => {
+  if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+    return handleError(res, "Invalid employee ID", 400, null);
+  }
+  if (!mongoose.Types.ObjectId.isValid(req.body.departmentId)) {
+    return handleError(res, "Invalid department ID", 400, null);
+  }
+  const employee = await Employee.findById(req.params.id);
+  if (!employee) {
+    return handleError(res, "Employee not found", 404, null);
+  }
+  const department = await Department.findById(req.body.departmentId);
+  if (!department) {
+    return handleError(res, "Department not found", 404, null);
+  }
+  const assginDept = await Employee.findByIdAndUpdate(
+    req.params.id,
+    { department: req.body.departmentId },
+    { new: true }
+  );
+  handleSuccess(res, "Department assigned successfully", 200, employee);
+});
+
 export {
   addDepartment,
   getDepartments,
   getDepartment,
   updateDepartment,
   updateDepartmentStatus,
+  assignDepartment,
 };
