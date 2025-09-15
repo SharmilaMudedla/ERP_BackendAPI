@@ -35,6 +35,27 @@ const employeeSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    departmentId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Departments",
+    },
+    designation: {
+      type: String,
+    },
+    joiningDate: {
+      type: Date,
+    },
+    employeeType: {
+      type: String,
+    },
+    salaryStructure: {
+      type: String,
+    },
+    status: {
+      type: String,
+      enum: ["Active", "Resigned", "Terminated"],
+      default: "active",
+    },
     isActive: {
       type: Boolean,
       default: true,
