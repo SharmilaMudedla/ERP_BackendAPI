@@ -6,7 +6,7 @@ import {
   updateDepartment,
   updateDepartmentStatus,
 } from "../Controllers/department.controller.js";
-import departmentValidator from "../Models/department.model.js";
+import departmentValidator from "../Validators/department.validator.js";
 import { verifyJwt } from "../Middlewares/jwt.js";
 
 const router = Router();

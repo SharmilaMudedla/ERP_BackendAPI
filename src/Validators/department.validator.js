@@ -1,7 +1,7 @@
 import { body } from "express-validator";
 
 const departmentValidator = [
-  body("name").trim().notEmpty().withMessage("Department name is required"),
+  body("name").notEmpty().withMessage("Department name is required"),
 
   body("description")
     .optional()
