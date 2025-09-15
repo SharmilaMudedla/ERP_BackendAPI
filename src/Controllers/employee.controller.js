@@ -28,7 +28,12 @@ const addEmployee = asyncHandler(async (req, res) => {
 // ====================== get all employees =======================
 
 const getEmployees = asyncHandler(async (req, res) => {
-  const employees = await Employee.find();
+  const employees = await Employee.find().populate([
+    {
+      path: "departmentId",
+      select: "name",
+    },
+  ]);
   handleSuccess(res, "Employees fetched successfully", 200, employees);
 });
 

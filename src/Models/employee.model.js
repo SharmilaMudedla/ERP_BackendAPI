@@ -31,22 +31,24 @@ const employeeSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    address: {
-      type: String,
-      required: true,
-    },
+
     departmentId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Departments",
+      required: true,
     },
     designation: {
       type: String,
+      required: true,
     },
     joiningDate: {
       type: Date,
+      required: true,
     },
     employeeType: {
       type: String,
+      enum: ["Full Time", "Part Time", "Contract", "Intern"],
+      required: true,
     },
     salaryStructure: {
       type: String,
