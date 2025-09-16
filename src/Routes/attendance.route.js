@@ -4,6 +4,7 @@ import {
   getAttendances,
   getSingleAttendance,
   updateAttendance,
+  getAttendanceByDate,
 } from "../Controllers/attendance.controller.js";
 import { verifyJwt } from "../Middlewares/jwt.js";
 import { attendanceValidator } from "../Validators/attendance.validator.js";
@@ -15,4 +16,5 @@ router
 router.route("/getAttendances").get(verifyJwt, getAttendances);
 router.route("/getSingleAttendance/:id").get(verifyJwt, getSingleAttendance);
 router.route("/updateAttendance/:id").put(verifyJwt, updateAttendance);
+router.route("/getAttendanceByDate/:date").get(verifyJwt, getAttendanceByDate);
 export default router;

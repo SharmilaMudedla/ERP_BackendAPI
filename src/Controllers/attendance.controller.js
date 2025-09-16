@@ -25,7 +25,7 @@ const getAttendances = asyncHandler(async (req, res) => {
   const attendances = await Attendance.find().populate([
     {
       path: "employeeId",
-      select: "name",
+      select: "firstName",
     },
   ]);
   handleSuccess(res, "Attendances fetched successfully", 200, attendances);
@@ -70,4 +70,34 @@ const updateAttendance = asyncHandler(async (req, res) => {
   );
   handleSuccess(res, "Attendance updated successfully", 200, attendance);
 });
-export { addAttendance, getAttendances, getSingleAttendance, updateAttendance };
+
+// ======================== get attendance data by date ============================
+const getAttendanceByDate = asyncHandler(async (req, res) => {
+  const { date } = req.params;
+
+  if (!date) {
+    return handleError(res, "Date is required", 400, null);
+  }
+  const start = new Date(date);
+  const end = new Date(date);
+  end.setHours(23, 59, 59, 999);
+  const attendances = await Attendance.find({
+    date: { $gte: start, $lte: end },
+  }).populate([
+    {
+      path: "employeeId",
+      select: "firstName lastName",
+    },
+  ]);
+  if (!attendances) {
+    return handleError(res, "records not found", 400, null);
+  }
+  handleSuccess(res, "records fetched successfully", 200, attendances);
+});
+export {
+  addAttendance,
+  getAttendances,
+  getSingleAttendance,
+  updateAttendance,
+  getAttendanceByDate,
+};
