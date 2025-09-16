@@ -1,0 +1,30 @@
+import mongoose from "mongoose";
+
+const attendanceSchema = new mongoose.Schema(
+  {
+    employeeId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Employees",
+      required: true,
+    },
+    date: {
+      type: Date,
+      required: true,
+    },
+    checkInTime: {
+      type: Date,
+      required: true,
+    },
+    checkOutTime: {
+      type: Date,
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ["Present", "Absent", "Leave", "Half-Day"],
+      required: true,
+    },
+  },
+  { timestamps: true }
+);
+export default mongoose.model("Attendance", attendanceSchema);
