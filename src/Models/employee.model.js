@@ -13,7 +13,7 @@ const employeeSchema = new mongoose.Schema(
     gender: {
       type: String,
       required: true,
-      Enum: ["male", "female"],
+      Enum: ["MALE", "FEMALE"],
     },
     dateOfBirth: {
       type: Date,
