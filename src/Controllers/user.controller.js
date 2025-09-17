@@ -6,6 +6,7 @@ import mongoose from "mongoose";
 import parseValidations from "../Utils/parseValidations.js";
 import bcrypt from "bcrypt";
 import { createJwtToken } from "../Middlewares/jwt.js";
+import employeeModel from "../Models/employee.model.js";
 // ################# CREATE USERS #####################
 const addUser = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
@@ -117,22 +118,31 @@ const userLogin = asyncHandler(async (req, res) => {
     );
   }
 
-  const user = await userModel.findOne({ email: req.body.email });
-  if (!user) {
-    return handleError(res, "User not found", 404, null);
-  }
+  let user = await userModel.findOne({ email: req.body.email });
+  let sourceCollection = "userdetails";
 
-  const comparePassword = await bcrypt.compare(
-    req.body.password,
-    user.password
-  );
-  if (!comparePassword) {
-    return handleError(res, "Invalid Password", 401, null);
+  if (!user) {
+    const employee = await employeeModel.findOne({ email: req.body.email });
+    if (!employee) {
+      return handleError(res, "User not found in either collection", 404, null);
+    }
+    if (req.body.password !== employee.employeeId) {
+      return handleError(res, "Invalid Password", 401, null);
+    }
+    sourceCollection = "employee";
+    user = employee;
+  } else {
+    const comparePassword = await bcrypt.compare(
+      req.body.password,
+      user.password
+    );
+    if (!comparePassword) {
+      return handleError(res, "Invalid Password", 401, null);
+    }
   }
 
   const token = createJwtToken(user);
-
-  handleSuccess(res, "User login successfully", 200, { token });
+  handleSuccess(res, "User login successfully", 200, { token, user });
 });
 
 export {
