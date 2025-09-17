@@ -1,4 +1,5 @@
 import { body } from "express-validator";
+import convertTo24Hour from "../Utils/convert24hours.js";
 
 const attendanceValidator = [
   body("employeeId").notEmpty().withMessage("Employee ID is required"),
@@ -10,19 +11,40 @@ const attendanceValidator = [
   body("checkInTime")
     .notEmpty()
     .withMessage("Check-in time is required")
-    .isISO8601()
-    .withMessage("Check-in time must be a valid date-time"),
+    .custom((value) => {
+      const regex = /^(\d{1,2}):(\d{2})\s?(AM|PM)$/i;
+      if (!regex.test(value.trim())) {
+        throw new Error("Check-in time must be in hh:mm AM/PM format");
+      }
+      return true;
+    }),
   body("checkOutTime")
     .notEmpty()
     .withMessage("Check-out time is required")
-    .isISO8601()
-    .withMessage("Check-out time must be a valid date-time")
     .custom((value, { req }) => {
-      if (
-        req.body.status === "Present" &&
-        new Date(value) <= new Date(req.body.checkInTime)
-      ) {
-        throw new Error("Check-out time must be after check-in time");
+      const regex = /^(\d{1,2}):(\d{2})\s?(AM|PM)$/i;
+      if (!regex.test(value.trim())) {
+        throw new Error("Check-out time must be in hh:mm AM/PM format");
+      }
+      if (req.body.status === "Present") {
+        let checkIn24, checkOut24;
+        try {
+          checkIn24 = convertTo24Hour(req.body.checkInTime.trim());
+          checkOut24 = convertTo24Hour(value.trim());
+        } catch (err) {
+          throw new Error("Invalid time format for check-in or check-out");
+        }
+
+        let checkIn = new Date(`1970-01-01T${checkIn24}`);
+        let checkOut = new Date(`1970-01-01T${checkOut24}`);
+
+        if (checkOut <= checkIn) {
+          checkOut.setDate(checkOut.getDate() + 1);
+        }
+
+        if (checkOut <= checkIn) {
+          throw new Error("Check-out time must be after check-in time");
+        }
       }
       return true;
     }),
