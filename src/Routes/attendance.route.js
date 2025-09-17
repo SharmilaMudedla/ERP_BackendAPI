@@ -7,7 +7,7 @@ import {
   getAttendanceByDate,
 } from "../Controllers/attendance.controller.js";
 import { verifyJwt } from "../Middlewares/jwt.js";
-import { attendanceValidator } from "../Validators/attendance.validator.js";
+import attendanceValidator from "../Validators/attendance.validator.js";
 
 const router = Router();
 router

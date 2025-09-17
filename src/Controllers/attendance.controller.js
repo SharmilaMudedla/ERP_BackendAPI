@@ -15,7 +15,7 @@ const addAttendance = asyncHandler(async (req, res) => {
       parseValidations(errors.array())
     );
   }
-  const existingAttendance = await Attendance.findOne(req.body.date);
+  const existingAttendance = await Attendance.findOne({ date: req.body.date });
   if (existingAttendance) {
     return handleError(
       res,
