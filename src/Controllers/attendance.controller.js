@@ -15,6 +15,15 @@ const addAttendance = asyncHandler(async (req, res) => {
       parseValidations(errors.array())
     );
   }
+  const existingAttendance = await Attendance.findOne(req.body.date);
+  if (existingAttendance) {
+    return handleError(
+      res,
+      "Attendance is already submitted on this date",
+      400,
+      null
+    );
+  }
 
   const attendance = await Attendance.create(req.body);
   handleSuccess(res, "Attendance added successfully", 201, attendance);
