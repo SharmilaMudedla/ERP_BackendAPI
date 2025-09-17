@@ -25,7 +25,7 @@ export const employeeValidator = [
     .withMessage("Phone number is required")
     .matches(/^[0-9]{10}$/)
     .withMessage("Phone number must be 10 digits"),
-
+  body("image").notEmpty().withMessage("Image is required"),
   body("address").notEmpty().withMessage("Address is required"),
 
   body("departmentId")
