@@ -47,6 +47,7 @@ const getSingleUser = asyncHandler(async (req, res) => {
 
   const getsingleuserdata = await userModel
     .findById(req.params.id)
+    .populate([{ path: "roleId", select: "name" }])
     .select("-password");
 
   if (!getsingleuserdata) {
@@ -142,7 +143,13 @@ const userLogin = asyncHandler(async (req, res) => {
   }
 
   const token = createJwtToken(user);
-  handleSuccess(res, "User login successfully", 200, { token, user });
+  handleSuccess(res, "User login successfully", 200, {
+    token,
+    user: {
+      email: user.email,
+      roleId: user.roleId,
+    },
+  });
 });
 
 export {

@@ -10,7 +10,7 @@ import RoleValidator from "../Validators/role.validator.js";
 import { verifyJwt } from "../Middlewares/jwt.js";
 const router = Router();
 router.route("/addRole").post(verifyJwt, RoleValidator, addRole);
-router.route("/getRoles").get(verifyJwt, getRoles);
+router.route("/getRoles").get(getRoles);
 router.route("/getSingleRole/:id").get(verifyJwt, getSingleRole);
 router.route("/updateRole/:id").put(verifyJwt, updateRole);
 router.route("/updateRoleStatus/:id").patch(verifyJwt, updateRoleStatus);
