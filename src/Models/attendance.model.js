@@ -3,8 +3,7 @@ import mongoose from "mongoose";
 const attendanceSchema = new mongoose.Schema(
   {
     employeeId: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Employees",
+      type: String,
       required: true,
     },
     date: {

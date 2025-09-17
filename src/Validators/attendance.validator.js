@@ -1,12 +1,7 @@
 import { body } from "express-validator";
 
 export const attendanceValidator = [
-  body("employeeId")
-    .notEmpty()
-    .withMessage("Employee ID is required")
-    .isMongoId()
-    .withMessage("Employee ID must be a valid Mongo ObjectId"),
-
+  body("employeeId").notEmpty().withMessage("Employee ID is required"),
   body("date")
     .notEmpty()
     .withMessage("Date is required")

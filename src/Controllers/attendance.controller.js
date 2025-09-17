@@ -22,12 +22,7 @@ const addAttendance = asyncHandler(async (req, res) => {
 
 // ====================== get all attendances =======================
 const getAttendances = asyncHandler(async (req, res) => {
-  const attendances = await Attendance.find().populate([
-    {
-      path: "employeeId",
-      select: "firstName",
-    },
-  ]);
+  const attendances = await Attendance.find();
   handleSuccess(res, "Attendances fetched successfully", 200, attendances);
 });
 
@@ -83,12 +78,7 @@ const getAttendanceByDate = asyncHandler(async (req, res) => {
   end.setHours(23, 59, 59, 999);
   const attendances = await Attendance.find({
     date: { $gte: start, $lte: end },
-  }).populate([
-    {
-      path: "employeeId",
-      select: "firstName lastName",
-    },
-  ]);
+  });
   if (!attendances) {
     return handleError(res, "records not found", 400, null);
   }
