@@ -15,7 +15,10 @@ const addAttendance = asyncHandler(async (req, res) => {
       parseValidations(errors.array())
     );
   }
-  const existingAttendance = await Attendance.findOne({ date: req.body.date });
+  const existingAttendance = await Attendance.findOne({
+    date: req.body.date,
+    employeeId: req.body.employeeId,
+  });
   if (existingAttendance) {
     return handleError(
       res,
@@ -24,7 +27,6 @@ const addAttendance = asyncHandler(async (req, res) => {
       null
     );
   }
-
   const attendance = await Attendance.create(req.body);
   handleSuccess(res, "Attendance added successfully", 201, attendance);
 });
