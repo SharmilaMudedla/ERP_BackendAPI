@@ -1,6 +1,7 @@
 import asyncHandler from "../Utils/asyncHandler.js";
 import { handleError, handleSuccess } from "../Utils/responseHandler.js";
 import Employee from "../Models/employee.model.js";
+import User from "../Models/employee.model.js";
 import { validationResult } from "express-validator";
 import parseValidations from "../Utils/parseValidations.js";
 import mongoose from "mongoose";
@@ -22,6 +23,7 @@ const addEmployee = asyncHandler(async (req, res) => {
     return handleError(res, "Employee already exists", 409, null);
   }
   const employee = await Employee.create(req.body);
+
   handleSuccess(res, "Employee added successfully", 201, employee);
 });
 
@@ -99,10 +101,17 @@ const updateEmployeeStatus = asyncHandler(async (req, res) => {
   );
 });
 
+// ============================== Total Employees =======================================
+const totalEmployees = asyncHandler(async (req, res) => {
+  const employees = await Employee.countDocuments();
+  return handleSuccess(res, "Count Fetched Successfully", 200, employees);
+});
+
 export {
   addEmployee,
   getEmployees,
   getSingleEmployee,
   updateEmployee,
   updateEmployeeStatus,
+  totalEmployees,
 };
