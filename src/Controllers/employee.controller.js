@@ -5,6 +5,8 @@ import User from "../Models/employee.model.js";
 import { validationResult } from "express-validator";
 import parseValidations from "../Utils/parseValidations.js";
 import mongoose from "mongoose";
+import { verifyJwt } from "../Middlewares/jwt.js";
+import bcrypt from "bcrypt";
 
 // ====================== create employee ========================
 
@@ -50,6 +52,19 @@ const getSingleEmployee = asyncHandler(async (req, res) => {
     return handleError(res, "Employee not found", 404, null);
   }
   handleSuccess(res, "Employee fetched successfully", 200, employee);
+});
+// ====================== get single employee Profiledetails =======================
+const getEmployeeProfileDetails = asyncHandler(async (req, res) => {
+  const userInfo = req.user;
+  if (!userInfo) {
+    return handleError(res, "Invalid or expired token", 401, null);
+  }
+  const employee = await Employee.findById(userInfo.id).select("-password");
+  if (!employee) {
+    return handleError(res, "Employee not found", 404, null);
+  }
+
+  handleSuccess(res, "Employee profile fetched successfully", 200, employee);
 });
 
 // ====================== update employee =======================
@@ -114,4 +129,5 @@ export {
   updateEmployee,
   updateEmployeeStatus,
   totalEmployees,
+  getEmployeeProfileDetails,
 };

@@ -5,6 +5,12 @@ import { validationResult } from "express-validator";
 import parseValidations from "../Utils/parseValidations.js";
 import mongoose from "mongoose";
 
+async function calculateLeavesLeft(employeeId) {
+  const totalLeaves = 12;
+  const leaves = await Leave.find({ employeeId });
+  const totalTaken = leaves.reduce((sum, leave) => sum + leave.totalDays, 0);
+  return totalLeaves - totalTaken;
+}
 // ====================== create leave ========================
 const addLeave = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
@@ -17,7 +23,23 @@ const addLeave = asyncHandler(async (req, res) => {
     );
   }
   const leave = await Leave.create(req.body);
-  handleSuccess(res, "Leave added successfully", 201, leave);
+  const leavesLeft = await calculateLeavesLeft(req.body.employeeId);
+  handleSuccess(res, "Leave added successfully", 201, {
+    ...leave.toObject(),
+    leavesLeft,
+  });
+});
+// ===================== get leaves left for a specific employee ====================
+const getLeavesLeft = asyncHandler(async (req, res) => {
+  const { employeeId } = req.params;
+  if (!employeeId) {
+    return handleError(res, "Employee ID is required", 400, null);
+  }
+  const leavesLeft = await calculateLeavesLeft(employeeId);
+  handleSuccess(res, "Leaves left fetched successfully", 200, {
+    employeeId,
+    leavesLeft,
+  });
 });
 
 // ========================== get leaves data ==================================
@@ -28,7 +50,7 @@ const getLeaves = asyncHandler(async (req, res) => {
       select: "firstName lastName",
     },
     {
-      path: "approvedBy",
+      path: "reportingManager",
       select: "name",
     },
   ]);
@@ -99,9 +121,22 @@ const updateLeaveStatus = asyncHandler(async (req, res) => {
   if (!singleLeave) {
     return handleError(res, "Leave not found", 404, null);
   }
-  const leave = await Leave.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
+
+  await Leave.findByIdAndUpdate(req.params.id, req.body);
+
+  const leavesLeft = await calculateLeavesLeft(req.body.employeeId);
+
+  const updatedLeave = await Leave.findById(req.params.id);
+  handleSuccess(res, "Leave updated successfully", 200, {
+    ...updatedLeave.toObject(),
+    leavesLeft,
   });
-  handleSuccess(res, "Leave updated successfully", 200, leave);
 });
-export { addLeave, getLeaves, getSingleLeave, updateLeave, updateLeaveStatus };
+export {
+  addLeave,
+  getLeaves,
+  getSingleLeave,
+  updateLeave,
+  updateLeaveStatus,
+  getLeavesLeft,
+};

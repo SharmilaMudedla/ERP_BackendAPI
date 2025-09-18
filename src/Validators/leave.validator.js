@@ -1,11 +1,7 @@
 import { body } from "express-validator";
 
 const leaveValidator = [
-  body("employeeId")
-    .notEmpty()
-    .withMessage("Employee ID is required")
-    .isMongoId()
-    .withMessage("Invalid Employee ID format"),
+  body("employeeId").notEmpty().withMessage("Employee ID is required"),
 
   body("startDate")
     .notEmpty()
@@ -42,8 +38,7 @@ const leaveValidator = [
     .isIn(["Pending", "Approved", "Rejected"])
     .withMessage("Status must be Pending, Approved, or Rejected"),
 
-  body("approvedBy")
-    .optional()
+  body("reportingManager")
     .isMongoId()
     .withMessage("Invalid approvedBy ID format"),
 ];

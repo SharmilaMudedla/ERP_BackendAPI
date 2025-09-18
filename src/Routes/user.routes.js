@@ -5,6 +5,7 @@ import {
   updateUser,
   updateUserStatus,
   userLogin,
+  getProfileDetails,
 } from "../Controllers/user.controller.js";
 import {
   UserValidator,
@@ -20,4 +21,5 @@ router.route("/getSingleUser/:id").get(verifyJwt, getSingleUser);
 router.route("/updateUser/:id").put(verifyJwt, updateUser);
 router.route("/changeUserStatus/:id").patch(verifyJwt, updateUserStatus);
 router.route("/login").post(LoginValidations, userLogin);
+router.route("/getProfileDetails").get(verifyJwt, getProfileDetails);
 export default router;

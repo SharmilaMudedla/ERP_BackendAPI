@@ -2,9 +2,21 @@ import mongoose from "mongoose";
 const leaveSchema = new mongoose.Schema(
   {
     employeeId: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: String,
       ref: "Employees",
       required: true,
+    },
+    employeeName: {
+      type: String,
+      required: true,
+    },
+    reportingManager: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "UserDetails",
+      required: true,
+    },
+    leavesLeft: {
+      type: Number,
     },
     startDate: {
       type: Date,
@@ -26,11 +38,6 @@ const leaveSchema = new mongoose.Schema(
       type: String,
       enum: ["Pending", "Approved", "Rejected"],
       default: "Pending",
-    },
-    approvedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "UserDetails",
-      required: true,
     },
   },
   { timestamps: true }

@@ -6,6 +6,7 @@ import {
   updateEmployee,
   updateEmployeeStatus,
   totalEmployees,
+  getEmployeeProfileDetails,
 } from "../Controllers/employee.controller.js";
 import employeeValidator from "../Validators/employee.validator.js";
 import { verifyJwt } from "../Middlewares/jwt.js";
@@ -18,4 +19,7 @@ router
   .route("/updateEmployeeStatus/:id")
   .patch(verifyJwt, updateEmployeeStatus);
 router.route("/totalEmployees").get(verifyJwt, totalEmployees);
+router
+  .route("/getEmployeeProfileDetails")
+  .get(verifyJwt, getEmployeeProfileDetails);
 export default router;

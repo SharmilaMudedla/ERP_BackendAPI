@@ -5,6 +5,7 @@ import {
   getSingleLeave,
   updateLeave,
   updateLeaveStatus,
+  getLeavesLeft,
 } from "../Controllers/leave.controller.js";
 import leaveValidator from "../Validators/leave.validator.js";
 import { verifyJwt } from "../Middlewares/jwt.js";
@@ -14,4 +15,5 @@ router.route("/getLeaves").get(verifyJwt, getLeaves);
 router.route("/getSingleLeave/:id").get(verifyJwt, getSingleLeave);
 router.route("/updateLeave/:id").put(verifyJwt, updateLeave);
 router.route("/updateLeaveStatus/:id").patch(verifyJwt, updateLeaveStatus);
+router.route("/getLeavesLeft/:employeeId").get(verifyJwt, getLeavesLeft);
 export default router;

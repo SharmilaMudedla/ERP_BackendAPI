@@ -5,8 +5,9 @@ import { validationResult } from "express-validator";
 import mongoose from "mongoose";
 import parseValidations from "../Utils/parseValidations.js";
 import bcrypt from "bcrypt";
-import { createJwtToken } from "../Middlewares/jwt.js";
+import { verifyJwt, createJwtToken } from "../Middlewares/jwt.js";
 import employeeModel from "../Models/employee.model.js";
+
 // ################# CREATE USERS #####################
 const addUser = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
@@ -56,7 +57,19 @@ const getSingleUser = asyncHandler(async (req, res) => {
 
   handleSuccess(res, "User fetched successfully", 200, getsingleuserdata);
 });
+// ################# GET SINGLE USER PROFILE DETAILS #####################
+const getProfileDetails = asyncHandler(async (req, res) => {
+  const userInfo = req.user;
+  if (!userInfo) {
+    return handleError(res, "Invalid or expired token", 401, null);
+  }
+  const userData = await userModel.findById(userInfo.id).select("-password");
+  if (!userData) {
+    return handleError(res, "User Data not found", 404, null);
+  }
 
+  handleSuccess(res, "User profile fetched successfully", 200, userData);
+});
 // ################# UPDATE USER #####################
 const updateUser = asyncHandler(async (req, res) => {
   const errors = validationResult(req);
@@ -159,4 +172,5 @@ export {
   updateUser,
   updateUserStatus,
   userLogin,
+  getProfileDetails,
 };
