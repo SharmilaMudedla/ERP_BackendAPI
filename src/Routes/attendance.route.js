@@ -6,7 +6,8 @@ import {
   updateAttendance,
   getAttendanceByDate,
   getAttendanceByEmployeeId,
-  getAttendanceBydateAndEmployeeId,
+  getAttendanceBydateAndEmployee,
+  getAttendanceByMonthAndEmployee,
 } from "../Controllers/attendance.controller.js";
 import { verifyJwt } from "../Middlewares/jwt.js";
 import attendanceValidator from "../Validators/attendance.validator.js";
@@ -23,6 +24,10 @@ router
   .route("/getAttendanceByEmployeeId/:employeeId")
   .get(verifyJwt, getAttendanceByEmployeeId);
 router
-  .route("/getAttendanceBydateAndEmployeeId/:date/:employeeId")
-  .get(verifyJwt, getAttendanceBydateAndEmployeeId);
+  .route("/getAttendanceBydateAndEmployee/:date/:employeeId")
+  .get(verifyJwt, getAttendanceBydateAndEmployee);
+router
+  .route("/getAttendanceByMonthAndEmployee/:month/:employeeId")
+  .get(verifyJwt, getAttendanceByMonthAndEmployee);
+
 export default router;

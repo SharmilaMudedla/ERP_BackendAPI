@@ -111,11 +111,28 @@ const getAttendanceByEmployeeId = asyncHandler(async (req, res) => {
 
 // =============================== get attendance by month by employee id ===============================
 
-const getAttendanceBydateAndEmployeeId = asyncHandler(async (req, res) => {
+const getAttendanceBydateAndEmployee = asyncHandler(async (req, res) => {
   const { date, employeeId } = req.params;
   const start = new Date(date);
   const end = new Date(date);
   end.setHours(23, 59, 59, 999);
+  const attendances = await Attendance.find({
+    date: { $gte: start, $lte: end },
+    employeeId,
+  });
+  if (!attendances) {
+    return handleError(res, "records not found", 400, null);
+  }
+  handleSuccess(res, "records fetched successfully", 200, attendances);
+});
+
+// ====================  get attendance by month and employee id ========================
+
+const getAttendanceByMonthAndEmployee = asyncHandler(async (req, res) => {
+  const { month, employeeId } = req.params;
+  const [year, mon] = month.split("-").map(Number);
+  const start = new Date(year, mon - 1, 1, 0, 0, 0);
+  const end = new Date(year, mon, 0, 23, 59, 59, 999);
   const attendances = await Attendance.find({
     date: { $gte: start, $lte: end },
     employeeId,
@@ -133,5 +150,6 @@ export {
   updateAttendance,
   getAttendanceByDate,
   getAttendanceByEmployeeId,
-  getAttendanceBydateAndEmployeeId,
+  getAttendanceBydateAndEmployee,
+  getAttendanceByMonthAndEmployee,
 };
