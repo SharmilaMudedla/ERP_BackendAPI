@@ -13,11 +13,15 @@ const attendanceSchema = new mongoose.Schema(
     },
     checkInTime: {
       type: String, // Store time as string with AM/PM format
-      required: true,
+      required: function () {
+        return this.status === "Present";
+      },
     },
     checkOutTime: {
       type: String, // Same here
-      required: true,
+      required: function () {
+        return this.status === "Present";
+      },
       validate: {
         validator: function (value) {
           if (this.status !== "Present") return true;
