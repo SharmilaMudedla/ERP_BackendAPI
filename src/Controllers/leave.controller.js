@@ -4,6 +4,10 @@ import Leave from "../Models/leave.model.js";
 import { validationResult } from "express-validator";
 import parseValidations from "../Utils/parseValidations.js";
 import mongoose from "mongoose";
+import nodemailer from "nodemailer";
+import emailTemplate from "../EmailTemplate/EmailTemplate.js";
+import User from "../Models/user.model.js";
+import employeeModel from "../Models/employee.model.js";
 
 async function calculateLeavesLeft(employeeId) {
   const totalLeaves = 12;
@@ -23,7 +27,38 @@ const addLeave = asyncHandler(async (req, res) => {
     );
   }
   const leave = await Leave.create(req.body);
+  const employee = await employeeModel
+    .findOne({ employeeId: req.body.employeeId })
+    .select("firstName lastName email");
+  const manager = await User.findById(req.body.reportingManager).select(
+    "name email"
+  );
+
+  if (!employee || !manager) {
+    return handleError(res, "Employee or Manager not found", 404, null);
+  }
   const leavesLeft = await calculateLeavesLeft(req.body.employeeId);
+  const transporter = nodemailer.createTransport({
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    auth: {
+      user: process.env.SMTP_EMAIL,
+      pass: process.env.SMTP_EMAIL_PASSWORD,
+    },
+  });
+
+  try {
+    const info = await transporter.sendMail({
+      from: `${employee.firstName} ${employee.lastName} <${employee.email}>`,
+      to: manager.email,
+      subject: "Leave Application Request",
+      html: emailTemplate({ ...leave.toObject(), employee, manager }),
+    });
+  } catch (err) {
+    console.error("Email sending failed:", err);
+  }
+
   handleSuccess(res, "Leave added successfully", 201, {
     ...leave.toObject(),
     leavesLeft,
@@ -44,16 +79,7 @@ const getLeavesLeft = asyncHandler(async (req, res) => {
 
 // ========================== get leaves data ==================================
 const getLeaves = asyncHandler(async (req, res) => {
-  const leaves = await Leave.find().populate([
-    {
-      path: "employeeId",
-      select: "firstName lastName",
-    },
-    {
-      path: "reportingManager",
-      select: "name",
-    },
-  ]);
+  const leaves = await Leave.find();
   handleSuccess(res, "Leaves fetched successfully", 200, leaves);
 });
 
@@ -63,16 +89,7 @@ const getSingleLeave = asyncHandler(async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
     return handleError(res, "Invalid Leave ID", 400, null);
   }
-  const leave = await Leave.findById(req.params.id).populate([
-    {
-      path: "employeeId",
-      select: "firstName lastName",
-    },
-    {
-      path: "approvedBy",
-      select: "name",
-    },
-  ]);
+  const leave = await Leave.findById(req.params.id);
   if (!leave) {
     return handleError(res, "Leave not found", 404, null);
   }
