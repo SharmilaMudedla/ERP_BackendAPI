@@ -3,7 +3,6 @@ const leaveSchema = new mongoose.Schema(
   {
     employeeId: {
       type: String,
-      ref: "Employees",
       required: true,
     },
     employeeName: {
@@ -17,6 +16,10 @@ const leaveSchema = new mongoose.Schema(
     },
     leavesLeft: {
       type: Number,
+    },
+    leaveType: {
+      type: String,
+      required: true,
     },
     startDate: {
       type: Date,
