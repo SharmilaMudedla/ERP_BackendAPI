@@ -7,6 +7,7 @@ import employeeRouter from "./Routes/employee.route.js";
 import departmentRouter from "./Routes/department.route.js";
 import attendanceRouter from "./Routes/attendance.route.js";
 import leaveRouter from "./Routes/leave.route.js";
+import eventRouter from "./Routes/event.route.js";
 const app = express();
 app.use(express.json());
 
@@ -26,5 +27,6 @@ app.use("/api/employee", employeeRouter);
 app.use("/api/department", departmentRouter);
 app.use("/api/attendance", attendanceRouter);
 app.use("/api/leave", leaveRouter);
+app.use("/api/event", eventRouter);
 
 export default app;
