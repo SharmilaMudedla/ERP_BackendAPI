@@ -149,6 +149,31 @@ const updateLeaveStatus = asyncHandler(async (req, res) => {
     leavesLeft,
   });
 });
+// =============================  leaves by date  =====================================
+const getLeavesByDate = asyncHandler(async (req, res) => {
+  const { date } = req.params;
+
+  if (!date) {
+    return handleError(res, "Date is required", 400, null);
+  }
+
+  const start = new Date(date);
+  start.setHours(0, 0, 0, 0);
+
+  const end = new Date(date);
+  end.setHours(23, 59, 59, 999);
+
+  const leaves = await Leave.find({
+    createdAt: { $gte: start, $lte: end },
+  });
+
+  if (!leaves || leaves.length === 0) {
+    return handleError(res, "Records not found", 404, null);
+  }
+
+  handleSuccess(res, "Records fetched successfully", 200, leaves);
+});
+
 export {
   addLeave,
   getLeaves,
@@ -156,4 +181,5 @@ export {
   updateLeave,
   updateLeaveStatus,
   getLeavesLeft,
+  getLeavesByDate,
 };
