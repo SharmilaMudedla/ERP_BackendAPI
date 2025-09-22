@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { heartBeatService } from "../controllers/heartbeat.controller.js";
+import { heartBeatService } from "../Controllers/heartbeat.controller.js";
 import { CronJob } from "cron";
 const heartbeatRouter = Router();
 
