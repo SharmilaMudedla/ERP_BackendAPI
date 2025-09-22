@@ -1,13 +1,12 @@
 import asyncHandler from "../Utils/asyncHandler.js";
 import { handleError, handleSuccess } from "../Utils/responseHandler.js";
 import Employee from "../Models/employee.model.js";
-import User from "../Models/employee.model.js";
 import { validationResult } from "express-validator";
 import parseValidations from "../Utils/parseValidations.js";
 import mongoose from "mongoose";
-import { verifyJwt } from "../Middlewares/jwt.js";
-import bcrypt from "bcrypt";
-
+import moment from "moment";
+import { EmployeeBirthDayEmailTemplate } from "../Utils/birthdayTemplate.js";
+import { sendEmail } from "../Utils/mailClient.js";
 // ====================== create employee ========================
 
 const addEmployee = asyncHandler(async (req, res) => {
@@ -121,6 +120,134 @@ const totalEmployees = asyncHandler(async (req, res) => {
   const employees = await Employee.countDocuments();
   return handleSuccess(res, "Count Fetched Successfully", 200, employees);
 });
+// ======================== get employee birthdays ===================================
+const getEmployeeBirthdays = asyncHandler(async (req, res) => {
+  const employees = await Employee.find();
+
+  const today = moment().startOf("day");
+  const startOfWeek = moment().startOf("week");
+  const endOfWeek = moment().endOf("week");
+  const thisMonth = today.month();
+
+  const birthdays = {
+    todaysBirthdays: [],
+    thisWeekBirthdays: [],
+    thisMonthBirthdays: [],
+  };
+
+  employees.forEach((employee) => {
+    const dobString = employee?.dateOfBirth;
+    if (!dobString) return;
+
+    const dobParts = String(dobString).split("-");
+    if (dobParts.length < 2) return;
+
+    const [dayStr, monthStr] = dobParts;
+    const day = parseInt(dayStr, 10);
+    const month = parseInt(monthStr, 10);
+
+    if (!day || !month) return;
+
+    const dobThisYear = moment({ year: today.year(), month: month - 1, day });
+
+    const minimalInfo = {
+      firstName: employee.firstName,
+      lastName: employee.lastName,
+      dateOfBirth: employee.dateOfBirth,
+      mobileNumber: employee.phone,
+    };
+
+    if (dobThisYear.isSame(today, "day")) {
+      birthdays.todaysBirthdays.push(minimalInfo);
+    }
+    if (dobThisYear.isBetween(startOfWeek, endOfWeek, "day", "[]")) {
+      birthdays.thisWeekBirthdays.push(minimalInfo);
+    }
+    if (month - 1 === thisMonth) {
+      birthdays.thisMonthBirthdays.push(minimalInfo);
+    }
+  });
+
+  // Sorting helper
+  const sortByDay = (a, b) => {
+    const dayA = parseInt(a.dateOfBirth.split("-")[0], 10);
+    const dayB = parseInt(b.dateOfBirth.split("-")[0], 10);
+    return dayA - dayB;
+  };
+
+  birthdays.thisWeekBirthdays.sort(sortByDay);
+  birthdays.thisMonthBirthdays.sort(sortByDay);
+  birthdays.todaysBirthdays.sort(sortByDay);
+
+  handleSuccess(res, "Birthdays Fetched Successfully", 200, birthdays);
+  // res.status(200).json(birthdays);
+});
+
+// ======================== send Birthday Remainders to Admin =======================
+// const sendBirthdayRemainderstoAdmin = asyncHandler(async (req, res) => {
+//   const employees = await Employee.find().lean();
+//   const tomorrow = moment().add(1, "day");
+//   const birthDayList = Employee.filter((employee) => {
+//     console.log(birthDayList);
+//     const birthdayString = employee.dateOfBirth;
+//     if (!birthdayString) return false;
+//     const [day, month] = birthdayString.split("-");
+//     const birthday = moment({ year: tomorrow.year(), month: month - 1, day });
+//     return birthday.isSame(tomorrow, "day");
+//   });
+
+//   if (!birthDayList.length) {
+//     return handleError(res, "No employees have birthdays today", 400, null);
+//   }
+//   const emailService = await sendEmail({
+//     to: "sharmilamudedla05@gmail.com",
+//     cc: ["kamadibhavani16@gmail.com"],
+//     subject: "REMAINDER OF BIRTHDAYS",
+//     text: null,
+//     html: EmployeeBirthDayEmailTemplate(birthDayList),
+//     from: "kamadibhavani16@gmail.com",
+//   });
+//   console.log("job triggered");
+//   handleSuccess(res, "Birthdays fetched successfully", 200, birthDayList);
+// });
+const sendBirthdayRemainderstoAdmin = asyncHandler(async (req, res) => {
+  const employees = await Employee.find().lean();
+  const tomorrow = moment().add(1, "day");
+
+  const birthDayList = employees.filter((employee) => {
+    if (!employee.dateOfBirth) return false;
+    const dob = moment(employee.dateOfBirth);
+    if (!dob.isValid()) return false;
+    return dob.date() === tomorrow.date() && dob.month() === tomorrow.month();
+  });
+
+  if (!birthDayList.length) {
+    if (res)
+      return handleError(
+        res,
+        "No employees have birthdays tomorrow",
+        400,
+        null
+      );
+    console.log("No employees have birthdays tomorrow");
+    return;
+  }
+
+  await sendEmail({
+    to: "sharmilamudedla05@gmail.com",
+    cc: ["kamadibhavani16@gmail.com"],
+    subject: "REMAINDER OF BIRTHDAYS",
+    html: EmployeeBirthDayEmailTemplate(birthDayList),
+    from: "kamadibhavani16@gmail.com",
+  });
+
+  console.log("Birthday reminder email sent successfully!");
+  return birthDayList;
+
+  if (res)
+    handleSuccess(res, "Birthdays fetched successfully", 200, birthDayList);
+  else console.log("Birthdays fetched successfully", birthDayList);
+});
 
 export {
   addEmployee,
@@ -130,4 +257,6 @@ export {
   updateEmployeeStatus,
   totalEmployees,
   getEmployeeProfileDetails,
+  sendBirthdayRemainderstoAdmin,
+  getEmployeeBirthdays,
 };

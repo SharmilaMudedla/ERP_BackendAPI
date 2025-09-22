@@ -21,7 +21,7 @@ const employeeSchema = new mongoose.Schema(
       Enum: ["MALE", "FEMALE"],
     },
     dateOfBirth: {
-      type: Date,
+      type: String,
       required: true,
     },
     email: {
@@ -51,7 +51,7 @@ const employeeSchema = new mongoose.Schema(
       required: true,
     },
     joiningDate: {
-      type: Date,
+      type: String,
       required: true,
     },
     employeeType: {

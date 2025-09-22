@@ -8,6 +8,7 @@ import nodemailer from "nodemailer";
 import emailTemplate from "../EmailTemplate/EmailTemplate.js";
 import User from "../Models/user.model.js";
 import employeeModel from "../Models/employee.model.js";
+import { sendEmail } from "../Utils/mailClient.js";
 
 async function calculateLeavesLeft(employeeId) {
   const totalLeaves = 12;
@@ -38,18 +39,18 @@ const addLeave = asyncHandler(async (req, res) => {
     return handleError(res, "Employee or Manager not found", 404, null);
   }
   const leavesLeft = await calculateLeavesLeft(req.body.employeeId);
-  const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false,
-    auth: {
-      user: process.env.SMTP_EMAIL,
-      pass: process.env.SMTP_EMAIL_PASSWORD,
-    },
-  });
+  // const transporter = nodemailer.createTransport({
+  //   host: "smtp.gmail.com",
+  //   port: 587,
+  //   secure: false,
+  //   auth: {
+  //     user: process.env.SMTP_EMAIL,
+  //     pass: process.env.SMTP_EMAIL_PASSWORD,
+  //   },
+  // });
 
   try {
-    const info = await transporter.sendMail({
+    const info = await sendEmail({
       from: `${employee.firstName} ${employee.lastName} <${employee.email}>`,
       to: manager.email,
       subject: "Leave Application Request",

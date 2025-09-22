@@ -10,8 +10,7 @@ export const employeeValidator = [
   body("dateOfBirth")
     .notEmpty()
     .withMessage("Date of birth is required")
-    .isISO8601()
-    .toDate()
+    .isDate()
     .withMessage("Date of birth must be a valid date"),
 
   body("email")
@@ -39,8 +38,7 @@ export const employeeValidator = [
   body("joiningDate")
     .notEmpty()
     .withMessage("Joining date is required")
-    .isISO8601()
-    .toDate()
+    .isDate()
     .withMessage("Joining date must be a valid date"),
 
   body("employeeType").notEmpty().withMessage("Employee type is required"),
