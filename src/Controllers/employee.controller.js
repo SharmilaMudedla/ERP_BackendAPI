@@ -184,53 +184,25 @@ const getEmployeeBirthdays = asyncHandler(async (req, res) => {
 });
 
 // ======================== send Birthday Remainders to Admin =======================
-// const sendBirthdayRemainderstoAdmin = asyncHandler(async (req, res) => {
-//   const employees = await Employee.find().lean();
-//   const tomorrow = moment().add(1, "day");
-//   const birthDayList = Employee.filter((employee) => {
-//     console.log(birthDayList);
-//     const birthdayString = employee.dateOfBirth;
-//     if (!birthdayString) return false;
-//     const [day, month] = birthdayString.split("-");
-//     const birthday = moment({ year: tomorrow.year(), month: month - 1, day });
-//     return birthday.isSame(tomorrow, "day");
-//   });
 
-//   if (!birthDayList.length) {
-//     return handleError(res, "No employees have birthdays today", 400, null);
-//   }
-//   const emailService = await sendEmail({
-//     to: "sharmilamudedla05@gmail.com",
-//     cc: ["kamadibhavani16@gmail.com"],
-//     subject: "REMAINDER OF BIRTHDAYS",
-//     text: null,
-//     html: EmployeeBirthDayEmailTemplate(birthDayList),
-//     from: "kamadibhavani16@gmail.com",
-//   });
-//   console.log("job triggered");
-//   handleSuccess(res, "Birthdays fetched successfully", 200, birthDayList);
-// });
 const sendBirthdayRemainderstoAdmin = asyncHandler(async (req, res) => {
   const employees = await Employee.find().lean();
   const tomorrow = moment().add(1, "day");
 
   const birthDayList = employees.filter((employee) => {
     if (!employee.dateOfBirth) return false;
-    const dob = moment(employee.dateOfBirth);
+    const dob = moment(employee.dateOfBirth, ["DD-MM-YYYY", "YYYY-MM-DD"]);
     if (!dob.isValid()) return false;
     return dob.date() === tomorrow.date() && dob.month() === tomorrow.month();
   });
 
   if (!birthDayList.length) {
-    if (res)
-      return handleError(
-        res,
-        "No employees have birthdays tomorrow",
-        400,
-        null
-      );
-    console.log("No employees have birthdays tomorrow");
-    return;
+    if (res) {
+      return handleSuccess(res, "No birthdays found for tomorrow", 200, []);
+    } else {
+      console.log("No birthdays found for tomorrow");
+      return [];
+    }
   }
 
   await sendEmail({
@@ -242,11 +214,17 @@ const sendBirthdayRemainderstoAdmin = asyncHandler(async (req, res) => {
   });
 
   console.log("Birthday reminder email sent successfully!");
-  return birthDayList;
 
-  if (res)
-    handleSuccess(res, "Birthdays fetched successfully", 200, birthDayList);
-  else console.log("Birthdays fetched successfully", birthDayList);
+  if (res) {
+    return handleSuccess(
+      res,
+      "Birthdays fetched successfully",
+      200,
+      birthDayList
+    );
+  } else {
+    return birthDayList;
+  }
 });
 
 export {
