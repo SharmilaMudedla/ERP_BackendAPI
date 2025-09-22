@@ -29,10 +29,10 @@ router.route("/getEmployeeBirthdays").get(verifyJwt, getEmployeeBirthdays);
 
 //CRONS
 
-const employeeBirthdayRemainderjob = new CronJob(
-  "0 17 * * *",
-  sendBirthdayRemainderstoAdmin
-);
-employeeBirthdayRemainderjob.start();
+// const employeeBirthdayRemainderjob = new CronJob(
+//   "0 17 * * *",
+//   sendBirthdayRemainderstoAdmin
+// );
+// employeeBirthdayRemainderjob.start();
 
 export default router;
