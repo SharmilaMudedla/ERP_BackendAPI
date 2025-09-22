@@ -11,7 +11,7 @@ import employeeModel from "../Models/employee.model.js";
 
 async function calculateLeavesLeft(employeeId) {
   const totalLeaves = 12;
-  const leaves = await Leave.find({ employeeId });
+  const leaves = await Leave.find({ employeeId, status: { $ne: "Rejected" } });
   const totalTaken = leaves.reduce((sum, leave) => sum + leave.totalDays, 0);
   return totalLeaves - totalTaken;
 }
