@@ -1,11 +1,15 @@
 import { Router } from "express";
-import { heartBeatService } from "../Controllers/heartbeat.controller.js";
+import {
+  heartBeatService,
+  cronHealthBeat,
+} from "../Controllers/heartbeat.controller.js";
 import { CronJob } from "cron";
+
 const heartbeatRouter = Router();
 
 heartbeatRouter.route("/").get(heartBeatService);
 
-const heartBeat = new CronJob("*/15 * * * *", heartBeatService);
-heartBeat.start();
+const heartBeatJob = new CronJob("*/15 * * * *", cronHealthBeat);
+heartBeatJob.start();
 
 export default heartbeatRouter;
