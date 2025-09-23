@@ -10,6 +10,7 @@ import leaveRouter from "./Routes/leave.route.js";
 import eventRouter from "./Routes/event.route.js";
 import heartbeatRouter from "./Routes/heartbeat.route.js";
 import payrollRouter from "./Routes/payroll.route.js";
+import salaryRouter from "./Routes/salarystructure.route.js";
 const app = express();
 app.use(express.json());
 
@@ -32,4 +33,5 @@ app.use("/api/attendance", attendanceRouter);
 app.use("/api/leave", leaveRouter);
 app.use("/api/event", eventRouter);
 app.use("/api/payroll", payrollRouter);
+app.use("/api/salarystructure", salaryRouter);
 export default app;
