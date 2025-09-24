@@ -5,7 +5,7 @@ import { validationResult } from "express-validator";
 import parseValidations from "../Utils/parseValidations.js";
 import mongoose from "mongoose";
 import nodemailer from "nodemailer";
-import emailTemplate from "../EmailTemplate/EmailTemplate.js";
+import emailTemplate from "../Utils/emailTemplate.js";
 import User from "../Models/user.model.js";
 import employeeModel from "../Models/employee.model.js";
 import { sendEmail } from "../Utils/mailClient.js";
