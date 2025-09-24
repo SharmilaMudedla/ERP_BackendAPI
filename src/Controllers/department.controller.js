@@ -40,7 +40,12 @@ const getDepartment = asyncHandler(async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
     return handleError(res, "Invalid department ID", 400, null);
   }
-  const department = await Department.findById(req.params.id);
+  const department = await Department.findById(req.params.id).populate([
+    {
+      path: "managerId",
+      select: "name",
+    },
+  ]);
   if (!department) {
     return handleError(res, "Department not found", 404, null);
   }

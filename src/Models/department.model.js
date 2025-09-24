@@ -10,14 +10,11 @@ const departmentSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    // managerId: {
-    //   type: mongoose.Schema.Types.ObjectId,
-    //   ref: "Employees",
-    // },
     managerId: {
-      type: String,
-      // ref: "Employees",
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "UserDetails",
     },
+
     isActive: {
       type: Boolean,
       default: true,
