@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 const payrollSchema = new mongoose.Schema(
   {
     employeeId: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
       ref: "Employees",
       required: true,
     },
