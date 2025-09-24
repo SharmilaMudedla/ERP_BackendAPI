@@ -169,7 +169,7 @@ const getLeavesByDate = asyncHandler(async (req, res) => {
   });
 
   if (!leaves || leaves.length === 0) {
-    return handleError(res, "Records not found", 404, null);
+    return handleError(res, "There are no leaves Today", 404, null);
   }
 
   handleSuccess(res, "Records fetched successfully", 200, leaves);
