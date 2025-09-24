@@ -124,6 +124,12 @@ const assignDepartment = asyncHandler(async (req, res) => {
   handleSuccess(res, "Department assigned successfully", 200, employee);
 });
 
+// =============================== total departments ================================
+const totalDepartments = asyncHandler(async (req, res) => {
+  const departments = await Department.countDocuments();
+  return handleSuccess(res, "Count Fetched Successfully", 200, departments);
+});
+
 export {
   addDepartment,
   getDepartments,
@@ -131,4 +137,5 @@ export {
   updateDepartment,
   updateDepartmentStatus,
   assignDepartment,
+  totalDepartments,
 };

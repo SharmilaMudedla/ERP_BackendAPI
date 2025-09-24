@@ -5,6 +5,7 @@ import {
   getDepartment,
   updateDepartment,
   updateDepartmentStatus,
+  totalDepartments,
 } from "../Controllers/department.controller.js";
 import departmentValidator from "../Validators/department.validator.js";
 import { verifyJwt } from "../Middlewares/jwt.js";
@@ -21,5 +22,5 @@ router
 router
   .route("/updateDepartmentStatus/:id")
   .patch(verifyJwt, updateDepartmentStatus);
-
+router.route("/totalDepartments").get(verifyJwt, totalDepartments);
 export default router;

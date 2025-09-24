@@ -165,6 +165,24 @@ const userLogin = asyncHandler(async (req, res) => {
   });
 });
 
+// ======================= total managers =============================
+const totalManagers = asyncHandler(async (req, res) => {
+  const managers = await userModel.aggregate([
+    {
+      $lookup: {
+        from: "roles",
+        localField: "roleId",
+        foreignField: "_id",
+        as: "role",
+      },
+    },
+    { $unwind: "$role" },
+    { $match: { "role.name": "manager" } },
+    { $count: "managerCount" },
+  ]);
+  handleSuccess(res, "Managers fetched successfully", 200, managers);
+});
+
 export {
   addUser,
   getUsers,
@@ -173,4 +191,5 @@ export {
   updateUserStatus,
   userLogin,
   getProfileDetails,
+  totalManagers,
 };
