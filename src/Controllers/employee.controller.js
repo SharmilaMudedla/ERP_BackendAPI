@@ -121,34 +121,82 @@ const totalEmployees = asyncHandler(async (req, res) => {
   return handleSuccess(res, "Count Fetched Successfully", 200, employees);
 });
 // ======================== get employee birthdays ===================================
+// const getEmployeeBirthdays = asyncHandler(async (req, res) => {
+//   const employees = await Employee.find();
+
+//   const today = moment().startOf("day");
+//   const startOfWeek = moment().startOf("week");
+//   const endOfWeek = moment().endOf("week");
+//   const thisMonth = today.month();
+
+//   const birthdays = {
+//     todaysBirthdays: [],
+//     thisWeekBirthdays: [],
+//     thisMonthBirthdays: [],
+//   };
+
+//   employees.forEach((employee) => {
+//     const dobString = employee?.dateOfBirth;
+//     if (!dobString) return;
+
+//     const dobParts = String(dobString).split("-");
+//     if (dobParts.length < 2) return;
+
+//     const [dayStr, monthStr] = dobParts;
+//     const day = parseInt(dayStr, 10);
+//     const month = parseInt(monthStr, 10);
+
+//     if (!day || !month) return;
+
+//     const dobThisYear = moment({ year: today.year(), month: month - 1, day });
+
+//     const minimalInfo = {
+//       firstName: employee.firstName,
+//       lastName: employee.lastName,
+//       dateOfBirth: employee.dateOfBirth,
+//       mobileNumber: employee.phone,
+//     };
+
+//     if (dobThisYear.isSame(today, "day")) {
+//       birthdays.todaysBirthdays.push(minimalInfo);
+//     }
+//     if (dobThisYear.isBetween(startOfWeek, endOfWeek, "day", "[]")) {
+//       birthdays.thisWeekBirthdays.push(minimalInfo);
+//     }
+//     if (month - 1 === thisMonth) {
+//       birthdays.thisMonthBirthdays.push(minimalInfo);
+//     }
+//   });
+
+//   const sortByDay = (a, b) => {
+//     const dayA = parseInt(a.dateOfBirth.split("-")[0], 10);
+//     const dayB = parseInt(b.dateOfBirth.split("-")[0], 10);
+//     return dayA - dayB;
+//   };
+
+//   birthdays.thisWeekBirthdays.sort(sortByDay);
+//   birthdays.thisMonthBirthdays.sort(sortByDay);
+//   birthdays.todaysBirthdays.sort(sortByDay);
+
+//   handleSuccess(res, "Birthdays Fetched Successfully", 200, birthdays);
+// });
 const getEmployeeBirthdays = asyncHandler(async (req, res) => {
   const employees = await Employee.find();
-
   const today = moment().startOf("day");
-  const startOfWeek = moment().startOf("week");
-  const endOfWeek = moment().endOf("week");
-  const thisMonth = today.month();
-
+  const tomorrow = moment().add(1, "day").startOf("day");
   const birthdays = {
-    todaysBirthdays: [],
-    thisWeekBirthdays: [],
-    thisMonthBirthdays: [],
+    tomorrowsBirthdays: [],
   };
 
   employees.forEach((employee) => {
-    const dobString = employee?.dateOfBirth;
-    if (!dobString) return;
-
-    const dobParts = String(dobString).split("-");
-    if (dobParts.length < 2) return;
-
-    const [dayStr, monthStr] = dobParts;
-    const day = parseInt(dayStr, 10);
-    const month = parseInt(monthStr, 10);
-
-    if (!day || !month) return;
-
-    const dobThisYear = moment({ year: today.year(), month: month - 1, day });
+    if (!employee?.dateOfBirth) return;
+    const dob = moment(employee.dateOfBirth, "YYYY-MM-DD");
+    if (!dob.isValid()) return;
+    const dobThisYear = moment({
+      year: today.year(),
+      month: dob.month(),
+      day: dob.date(),
+    });
 
     const minimalInfo = {
       firstName: employee.firstName,
@@ -156,31 +204,17 @@ const getEmployeeBirthdays = asyncHandler(async (req, res) => {
       dateOfBirth: employee.dateOfBirth,
       mobileNumber: employee.phone,
     };
-
-    if (dobThisYear.isSame(today, "day")) {
-      birthdays.todaysBirthdays.push(minimalInfo);
-    }
-    if (dobThisYear.isBetween(startOfWeek, endOfWeek, "day", "[]")) {
-      birthdays.thisWeekBirthdays.push(minimalInfo);
-    }
-    if (month - 1 === thisMonth) {
-      birthdays.thisMonthBirthdays.push(minimalInfo);
+    if (dobThisYear.isSame(tomorrow, "day")) {
+      birthdays.tomorrowsBirthdays.push(minimalInfo);
     }
   });
 
-  // Sorting helper
-  const sortByDay = (a, b) => {
-    const dayA = parseInt(a.dateOfBirth.split("-")[0], 10);
-    const dayB = parseInt(b.dateOfBirth.split("-")[0], 10);
-    return dayA - dayB;
-  };
-
-  birthdays.thisWeekBirthdays.sort(sortByDay);
-  birthdays.thisMonthBirthdays.sort(sortByDay);
-  birthdays.todaysBirthdays.sort(sortByDay);
-
-  handleSuccess(res, "Birthdays Fetched Successfully", 200, birthdays);
-  // res.status(200).json(birthdays);
+  handleSuccess(
+    res,
+    "Tomorrow's Birthdays Fetched Successfully",
+    200,
+    birthdays
+  );
 });
 
 // ======================== send Birthday Remainders to Admin =======================
