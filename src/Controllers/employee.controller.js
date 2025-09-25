@@ -1,6 +1,7 @@
 import asyncHandler from "../Utils/asyncHandler.js";
 import { handleError, handleSuccess } from "../Utils/responseHandler.js";
 import Employee from "../Models/employee.model.js";
+import Department from "../Models/department.model.js";
 import { validationResult } from "express-validator";
 import parseValidations from "../Utils/parseValidations.js";
 import mongoose from "mongoose";
@@ -260,6 +261,21 @@ const sendBirthdayRemainderstoAdmin = asyncHandler(async (req, res) => {
     return birthDayList;
   }
 });
+// ======================== send Birthday Remainders to Admin =======================
+const getEmployeesAssignedToManager = asyncHandler(async (req, res) => {
+  const managerId = req.params.id;
+
+  const departments = await Department.find({ managerId }).select("_id");
+
+  const employees = await Employee.find({
+    departmentId: { $in: departments.map((d) => d._id) },
+  }).populate({
+    path: "departmentId",
+    select: "name managerId",
+  });
+
+  handleSuccess(res, "Employees fetched successfully", 200, employees);
+});
 
 export {
   addEmployee,
@@ -271,4 +287,5 @@ export {
   getEmployeeProfileDetails,
   sendBirthdayRemainderstoAdmin,
   getEmployeeBirthdays,
+  getEmployeesAssignedToManager,
 };

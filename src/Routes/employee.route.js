@@ -9,6 +9,7 @@ import {
   getEmployeeProfileDetails,
   sendBirthdayRemainderstoAdmin,
   getEmployeeBirthdays,
+  getEmployeesAssignedToManager,
 } from "../Controllers/employee.controller.js";
 import employeeValidator from "../Validators/employee.validator.js";
 import { verifyJwt } from "../Middlewares/jwt.js";
@@ -26,6 +27,9 @@ router
   .route("/getEmployeeProfileDetails")
   .get(verifyJwt, getEmployeeProfileDetails);
 router.route("/getEmployeeBirthdays").get(verifyJwt, getEmployeeBirthdays);
+router
+  .route("/getEmployeesAssignedToManager/:id")
+  .get(verifyJwt, getEmployeesAssignedToManager);
 
 //CRONS
 
