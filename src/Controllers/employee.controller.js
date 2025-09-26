@@ -37,6 +37,10 @@ const getEmployees = asyncHandler(async (req, res) => {
       path: "departmentId",
       select: "name managerId",
     },
+    {
+      path: "salaryStructure",
+      select: "basicSalary",
+    },
   ]);
   handleSuccess(res, "Employees fetched successfully", 200, employees);
 });

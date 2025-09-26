@@ -27,10 +27,12 @@ const employeeSchema = new mongoose.Schema(
     email: {
       type: String,
       required: true,
+      unique: true,
     },
     phone: {
       type: String,
       required: true,
+      unique: true,
     },
     image: {
       type: String,
@@ -60,7 +62,9 @@ const employeeSchema = new mongoose.Schema(
       required: true,
     },
     salaryStructure: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SalaryStructure",
+      required: true,
     },
     status: {
       type: String,
