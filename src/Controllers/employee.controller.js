@@ -116,7 +116,7 @@ const updateEmployeeStatus = asyncHandler(async (req, res) => {
   );
 });
 
-// ============================== Total Employees =======================================
+// ============================== Total Employees count =======================================
 const totalEmployees = asyncHandler(async (req, res) => {
   const employees = await Employee.countDocuments();
   return handleSuccess(res, "Count Fetched Successfully", 200, employees);
