@@ -62,7 +62,9 @@ const employeeSchema = new mongoose.Schema(
       required: true,
     },
     salaryStructure: {
-      type: String,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SalaryStructure",
+      required: true,
     },
     status: {
       type: String,
