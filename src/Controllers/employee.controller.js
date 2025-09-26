@@ -39,7 +39,7 @@ const getEmployees = asyncHandler(async (req, res) => {
     },
     {
       path: "salaryStructure",
-      select: "basicSalary HRA transportAllowance otherAllowance taxPercentage",
+      select: "basicSalary",
     },
   ]);
   handleSuccess(res, "Employees fetched successfully", 200, employees);
